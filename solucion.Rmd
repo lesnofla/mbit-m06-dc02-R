@@ -1,0 +1,193 @@
+---
+#title: "solucion"
+#author: "Carlos Alfonsel"
+#date: "7/4/2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 5
+    number_sections: true
+    code_folding: hide
+    toc_float:
+        collapsed: true
+        smoth_scroll: true
+---
+
+-----------------------------------------------------------------------------------------------
+<img src="./mbit_logo.jpg" align="right" style="float" width="100">
+<font color="#CA3532"><h1 align="left">INTRODUCCIÓN A R. ESTADÍSTICA DESCRIPTIVA Y MODELOS LINEALES.</h1></font>
+<font color="#CA3532"><h3 align="left">EJERCICIO EVALUABLE M06-DC02: INTRODUCCIÓN A R.</h3></font>
+<font color="#6E6E6E"><h5 align="left">CARLOS ALFONSEL carlos.alfonsel@mbitschool.com</h5></font>
+`r Sys.Date()`
+
+-----------------------------------------------------------------------------------------------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**EJERCICIO EVALUABLE 2019-2020. INTRODUCCIÓN A R, ESTADÍSTICA Y MODELOS LINEALES.**
+
+**MBIT BIG DATA, CLOUD & ANALYTICS MARZO 2020**
+
+Carlos Alfonsel 
+carlos.alfonsel@mbitschool.com
+
+---
+
+# Instalación y Uso de Librerías. Carga de Ficheros.
+
+## Instala o carga los paquetes MASS e ISLR en tu distribución de R.
+```{r}
+library(MASS)
+library(ISLR)
+
+```
+
+## Carga el fichero DataPLanes_OK.csv contenido en la carpeta data en la variable de R de tipo dataframe DataPlanes_OK. ¿Cuál es el número de filas y columnas del dataframe?.
+```{r}
+# Se importa el fichero CSV, teniendo en cuenta que la primera fila incluye los nombres de las variables, que el separador entre campos es el carácter ";", y que la primera columna indica el número de fila: 
+DataPlanes_OK <- read.csv("./data/DataPLanes_OK.csv", header = TRUE, sep = ";", row.names = 1)
+
+# Se comprueba que el elemento creado es de tipo "dataframe":
+class(DataPlanes_OK)
+
+# Se sacan por consola las 10 primeras filas del dataframe:
+head(DataPlanes_OK, 10)
+
+```
+
+**Número de filas y columnas del dataframe creado (DataPlanes_OK):**
+```{r}
+# Número de filas del dataframe
+paste("NÚMERO DE FILAS = ", nrow(DataPlanes_OK))
+
+# Número de columnas del dataframe
+paste("NÚMERO COLUMNAS = ", ncol(DataPlanes_OK))
+
+```
+
+# Muestreo y Manejo de Valores Ausentes.
+
+## Selecciona una muestra aleatoria sin reemplazo del 20% de las filas del dataframe DataPlanes_OK_filter. Pista: busca ayuda sobre la función sample.
+```{r}
+# Creamos el nuevo dataframe a partir de un muestreo aleatorio sin reemplazo del 20% de las filas del dataframe original:  
+DataPlanes_OK_filter <- DataPlanes_OK[sample(0.2*nrow(DataPlanes_OK), replace = F),]
+
+# Vemos las 10 primeras filas del nuevo dataframe DataPlanes_OK_filter:
+head(DataPlanes_OK_filter, 10)
+
+# Comprobamos que el número de filas del nuevo dataframe es el 20% del original:
+paste("NÚMERO DE FILAS DATAFRAME MUESTREADO = ", nrow(DataPlanes_OK_filter))
+paste("NÚMERO COLUMNAS DATAFRAME MUESTREADO = ", ncol(DataPlanes_OK_filter))
+
+```
+
+## En el data frame DataPlanes_OK_filter, elimina las filas que contengan algún NA y almacena el nuevo dataframe en una variable de R llamada DataPlanes_OK_filter_clean.
+```{r}
+# Hacemos un summary del dataframe DataPlanes_OK_filter para comprobar si hay valores ausentes:
+summary(DataPlanes_OK_filter)
+
+# Vemos las dimenciones del dataframe mencionado:
+dim(DataPlanes_OK_filter)
+
+```
+
+**Eliminamos las filas con valores NA y vemos el tamaño del nuevo dataframe:**
+```{r}
+# Mediante la función na.omit eliminamos las filas con algún campo con missing value: 
+DataPlanes_OK_filter_clean <- na.omit(DataPlanes_OK_filter)
+
+# Vemos las 10 primeras filas del dataframe DataPlanes_OK_filter_clean:
+head(DataPlanes_OK_filter_clean, 10)
+
+# Comprobamos que el nuevo dataframe no tiene ningún campo con valor NA:
+summary(DataPlanes_OK_filter_clean)
+dim(DataPlanes_OK_filter_clean)
+paste("FILAS ELIMINADAS = ", nrow(DataPlanes_OK_filter) - nrow(DataPlanes_OK_filter_clean))
+
+```
+
+# Estadísticos Descriptivos.
+
+**Calcula la media, primer cuartil, mediana, tercer cuartil mínimo y máximo de las varibles contenidas en las columnas del dataframe DataPlanes_OK_filter_clean.**
+```{r}
+# Con la función summary podemos obtener todos los estadísticos solicitados en el enunciado:
+summary(DataPlanes_OK_filter_clean)
+
+```
+
+**NOTA IMPORTANTE**: *cabe señalar que los estadísticos solicitados (media, mediana, primer y tercer cuartil, mínimo y máximo) sólo se pueden calcular para las variables de tipo numérico.*
+
+
+# Modelos Lineales.
+
+## Obtén un modelo lineal (pendiente y ordenada en el origen) que permita obtener la relación entre la variable arr_delay y dep_delay.
+```{r}
+# Mediante la función attach añadimos el path del dataframe al sistema:
+attach(DataPlanes_OK_filter_clean)
+
+# Mediante la función lm obtenemos una regresión lineal simple entre las variables arr_delay y dep_delay:
+lm.fit = lm(arr_delay~dep_delay)
+
+# La función coef nos permite obtener los coeficientes del modelo lineal: pendiente y ordenada en el origen.
+coef(lm.fit)
+
+```
+
+## Obtén el error estándar de la pendiente y la ordenada en el origen del ajuste realizado. ¿Cuál es el R2 del ajuste realizado?. ¿Podemos afirmar que la relación es lineal en base al valor de R2?.**
+```{r}
+# La función summary nos presenta un resumen de los parámetros más importantes del modelo:
+summary(lm.fit)
+
+# Mediante la función plot podemos obtener una representación gráfica de algunos aspectos del modelo:
+plot(lm.fit, pch = 3, col = "#CA3532")
+
+```
+
+**Obtén el error estándar de la pendiente y la ordenada en el origen del ajuste realizado:**
+
+*En base a los resultados obtenidos, vemos que el Error Estándar es 0.062306, mientras que la Ordenada en el Origen es 0.001901.*
+
+
+**¿Cuál es el R2 del ajuste realizado?:**
+
+*En base a los resultados obtenidos, el Coeficiente de Determinación (R2) Ajustado es 0.807 (80.7%).*
+
+
+**¿Podemos afirmar que la relación es lineal en base al valor de R2?:**
+
+*En base a los resultados del Coeficiente de Determinación (R2) Ajustado, podemos inferir que el modelo explica al casi 81% el comportamiento real de la variable* **del_delay** *en función de la otra variable* **arr_delay***. Es decir, este modelo basado en una regresión simple es un modelo cuyas estimaciones se ajustan bastante bien al comportamiento real de la variable mencionada.*
+
+
+
+## Representa en un gráfico de dispersión las variables arr_delay en el eje y y dep_delay en el eje x. Representa en el mismo gráfico la recta de regresión obtenida con el modelo. Viendo la relación entre ambas variables, ¿piensas que las conclusiones que has sacado en el partado anterior son correctas?.
+```{r}
+# Con la función plot(x, y, ...) dibujamos un diagrama de dispersión de las variables indicadas, y con las etiquetas pch, col, main, xlab e ylab modificamos las características del gráfico: tipo de punto, color, título del gráfico y de los ejes.
+plot(dep_delay, 
+     arr_delay, 
+     pch = 3, 
+     col = "#CA3532",
+     main = "Diagrama de dispersión: arr_delay vs dep_delay",
+     xlab = "DEPARTURE DELAY",
+     ylab = "ARRIVAL DELAY")
+
+# Con la función abline(x, ...) añadimos la recta obtenida en el apartado 4.a como resultado de la aplicación de una regresión lineal: igualmente con las etiquetas lty, lwd y col modificamos las características de tipo, tamaño y color de la línea.
+abline(lm.fit, 
+       lty = 2,
+       lwd = 3, 
+       col = "#CA3532")
+
+
+```
+
+**Viendo la relación entre ambas variables, ¿piensas que las conclusiones que has sacado en el apartado anterior son correctas?:**
+
+*En base a los resultados gráficos obtenidos, las conclusiones del apartado anterior a partir del valor de R2 (Coef. de Determinación) Ajustado se ven confirmadas, puesto que podemos ver que la relación real entre estas variables se ajusta bastante bien a la regresión lineal calculada.*
+
+
+
+-----------------------------------------------------------------------------------------------
+<font color="#CA3532"><h4 align="left">INTRODUCCIÓN A R. ESTADÍSTICA DESCRIPTIVA Y MODELOS LINEALES.</h1></font>
+<font color="#CA3532"><h4 align="left">EJERCICIO EVALUABLE M06-DC02: INTRODUCCIÓN A R.</h3></font>
+<font color="#6E6E6E"><h6 align="left">CARLOS ALFONSEL carlos.alfonsel@mbitschool.com</h5></font> 
