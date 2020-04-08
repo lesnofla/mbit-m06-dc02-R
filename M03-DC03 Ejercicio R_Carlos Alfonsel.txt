@@ -1,0 +1,69 @@
+EJERCICIO EVALUABLE 2019-2020. INTRODUCCIÓN A R, ESTADÍSTICA Y MODELOS LINEALES.
+MBIT BIG DATA, CLOUD & ANALYTICS MARZO 2020
+Carlos Alfonsel (carlos.alfonsel@mbitschool.com)
+
+# 1. Instalación y Uso de Librerías. Carga de Ficheros.
+
+```{r}
+# Carga de librerías en entorno R:
+library(MASS)
+library(ISLR)
+
+# Carga de dataset y transformación en dataframe:
+DataPlanes_OK <- read.csv("./data/DataPLanes_OK.csv", header = TRUE, sep = ";", row.names = 1)
+
+# Obtención de número de filas y columnas del dataframe:
+paste("NÚMERO DE FILAS = ", nrow(DataPlanes_OK))
+paste("NÚMERO COLUMNAS = ", ncol(DataPlanes_OK))
+```
+
+# 2. Muestreo y Manejo de Valores Ausentes.
+
+```{r}
+# Muestra aleatoria sin reemplazo del 20% de las filas del dataframe original:  
+DataPlanes_OK_filter <- DataPlanes_OK[sample(0.2*nrow(DataPlanes_OK), replace = FALSE),]
+
+# Mediante la función na.omit eliminamos las filas con algún campo NA: 
+DataPlanes_OK_filter_clean <- na.omit(DataPlanes_OK_filter)
+
+# Comprobamos el número de filas eliminadas:
+paste("FILAS ELIMINADAS = ", nrow(DataPlanes_OK_filter) - nrow(DataPlanes_OK_filter_clean))
+```
+
+# 3. Estadísticos Descriptivos.
+
+```{r}
+# Con la función summary podemos obtener los siguientes estadísticos: media, primer cuartil, mediana, tercer cuartil, mínimo y máximo de las varibles de tipo numérico contenidas en las columnas del dataframe.
+summary(DataPlanes_OK_filter_clean)
+```
+
+# 4. Modelos Lineales.
+
+```{r}
+# La función attach añade el path del dataframe al sistema:
+attach(DataPlanes_OK_filter_clean)
+
+# Mediante la función lm obtenemos una regresión lineal simple entre las variables arr_delay y dep_delay:
+lm.fit = lm(arr_delay~dep_delay)
+
+# La función coef nos permite obtener los coeficientes del modelo lineal: pendiente y ordenada en el origen.
+coef(lm.fit)
+
+# La función summary nos presenta un resumen de los parámetros más importantes del modelo, entre ellos el error estándar y la ordenada en el origen:
+summary(lm.fit)
+
+# Con la función plot(x, y, ...) dibujamos un diagrama de dispersión entre dos de las variables del dataframe:
+plot(dep_delay, 
+     arr_delay, 
+     pch = 3, 
+     col = "#CA3532",
+     main = "Diagrama de dispersión: arr_delay vs dep_delay",
+     xlab = "DEPARTURE DELAY",
+     ylab = "ARRIVAL DELAY")
+
+# Con la función abline(x, ...) añadimos la recta obtenida como resultado de la regresión lineal del modelo:
+abline(lm.fit, 
+       lty = 2,
+       lwd = 3, 
+       col = "#CA3532")
+```
